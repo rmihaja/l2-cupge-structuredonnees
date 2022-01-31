@@ -1,16 +1,14 @@
-#define STACK_SIZE 30
+#ifndef __STACK_H__
+#define __STACK_H__
 
-typedef struct pile_s {
-    int t[STACK_SIZE];
-    int sommet;
-} Stack;
+typedef struct stack_s *Stack;
 
-void stack(Stack *pile);
-int push(Stack *pile, int n);
-int pop(Stack *pile);
-int top(Stack *pile);
-int get(Stack *pile, int i);
-int isIn(Stack *pile, int n);
-int toString(Stack *pile);
+Stack stack();
 
-int isEmpty(Stack *pile);
+Stack push(Stack, int);
+Stack pop(Stack);
+int size(Stack);
+int isEmpty(Stack);
+int top(Stack);
+
+#endif

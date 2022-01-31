@@ -3,75 +3,90 @@
 #include <assert.h>
 #include "pile.h"
 
-void stack(Stack *pile) {
-    pile->sommet = -1;
-    return;
+typedef struct node_s {
+    int value;
+    struct node_s *next;
+} *Node;
+
+struct stack_s {
+    Node top;
+    int size;
+};
+
+Stack stack() {
+    Stack stack = (Stack) malloc(sizeof(struct stack_s));
+    stack->size = 0;
+    return stack;
 }
 
-// ? méthode élémentaire
 // 0 := vide
 // 1 := non vide
-int isEmpty(Stack *pile) {
-    if(top(pile) == -1) {
+int isEmpty(Stack stack) {
+    if (stack->size == 0) {
         return 0;
     }
-    return 1;
+    else {
+        return 1;
+    }
 }
 
-int push(Stack *pile, int n) {
-    // ? vérification qu'on peut empiler
-    // * implémentation assert
-    assert(top(pile) < STACK_SIZE - 1);
-
-    // empilation
-    pile->t[++pile->sommet] = n;
-    return 0;
+int size(Stack stack) {
+    return stack->size;
 }
 
-int pop(Stack *pile) {
-    // * implémentation assert
-    assert(!isEmpty(pile));
-
-    // suppression
-    pile->sommet--;
-    return 0;
-}
-
-int top(Stack *pile) {
-    assert(!isEmpty(pile));
-    return pile->sommet;
-}
-
-int get(Stack *pile, int i) {
-    return pile->t[i];
-}
-
-// 0 := is in
-// 1 := is not in
-int isIn(Stack *pile, int n)
-{
-    assert(!isEmpty(pile));
-    for (int i = 0; i < top(pile); i++) {
-        if (get(pile, i) == n) {
+// 0 := element dedans
+// 1 := element non dedans
+int isIn(Stack stack, int n) {
+    Node current_node = stack->top;
+    while (current_node != NULL) {
+        if (current_node->value == n) {
             return 0;
         }
+        current_node = current_node->next;
     }
     return 1;
 }
 
-int toString(Stack *pile) {
-    assert(!isEmpty(pile));
-    printf("[");
-    for (int i = 0; i < top(pile) - 1; i++)
-    {
-        printf("%d, ", get(pile, i));
+Stack push(Stack stack, int n)
+{
+    Node new_top = (Node)malloc(sizeof(struct node_s));
+    new_top->value = n;
+    if (isEmpty(stack)) {
+        stack->top = new_top;
+        stack->size++;
     }
-    printf("%d]\n", get(pile, top(pile)));
+    else {
+        if (isIn(stack, n) == 1) {
+            new_top->next = stack->top;
+            stack->top = new_top;
+            stack->size++;
+        }
+    }
+
+    return stack;
+}
+Stack pop(Stack stack) {
+    assert(isEmpty(stack));
+
+    Node old_top = stack->top;
+    stack->top = stack->top->next;
+    free(old_top);
+
+    stack->size--;
+
+    return stack;
+}
+
+int top(Stack stack) {
+    assert(isEmpty(stack));
+
+    return stack->top->value;
 }
 
 #ifdef DEBUG
 
-int main() {
+int
+main() {
     Stack p;
     stack(&p);
 }

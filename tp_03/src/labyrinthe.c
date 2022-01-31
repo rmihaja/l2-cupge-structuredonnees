@@ -4,15 +4,18 @@
 
 #define FERME 0
 #define OUVERT 1
+#define PARCOURU 2
 
 #define LIGNES 5
 #define COLONNES 6
 
+// typedef enum possible_neighbors_list {
+//     above =
+// }
+
 typedef struct pas_s {
-    int start_x;
-    int start_y;
-    int end_x;
-    int end_y;
+    int start;
+    int end;
     Stack path;
 } Pas;
 
@@ -44,6 +47,9 @@ int printf_laby(int *laby) {
             if (*(laby + (i * LIGNES) + j) == FERME) {
                 printf("X");
             }
+            else if (*(laby + (i * LIGNES) + j) == PARCOURU) {
+                printf("o");
+            }
             else {
                 printf(" ");
             }
@@ -55,15 +61,14 @@ int printf_laby(int *laby) {
 
 int propose(int *laby) {
     char answer;
-    while(answer != 'y') {
-        printf("\n");
-        printf("test\n");
+    // while(answer != 'y') {
         new_laby(laby);
         printf_laby(laby);
 
-        printf("Utiliser le labyrinthe ? [y/N] ");
-        scanf("%c\n", &answer);
-    }
+        printf("Utiliser le labyrinthe ? [y/N] y\n");
+        // scanf("%c\n", &answer);
+        // printf("Votre réponse : %c\n", answer);
+    // }
     return 0;
 }
 
@@ -72,20 +77,68 @@ int coordonnees(int ligne, int colonne) {
 }
 
 int init_pas(Pas *pas) {
-    printf("0");
-    pas->start_x = 0;
-    pas->start_y = 1;
-    pas->end_x = LIGNES;
-    pas->end_y = COLONNES - 1;
+    pas->start = coordonnees(0, 1);
+    pas->end = coordonnees(LIGNES - 1, COLONNES - 2);
 
-    printf("1");
-    stack(&pas->path);
-    printf("2");
-    push(&pas->path, coordonnees(0, 1));
-    push(&pas->path, coordonnees(1, 1));
-    printf("3");
+    pas->path = stack();
 
-    toString(&pas->path);
+    push(pas->path, pas->start);
+    push(pas->path, coordonnees(1, 1));
+
+    return 0;
+}
+
+Pas *parcourir(int *laby, Pas *pas) {
+    // MST
+    while (size(pas->path) > 2 || top(pas->path) != pas->end) {
+        int left = top(pas->path) - 1;
+        int right = top(pas->path) + 1;
+        int above = top(pas->path) - COLONNES + 1;
+        int bottom = top(pas->path) + COLONNES;
+
+            // check left
+        if (laby[left] == OUVERT)
+        {
+            laby[left] = PARCOURU;
+            push(pas->path, left);
+        }
+        // check right
+        else if (laby[right] == OUVERT) {
+            laby[right] = PARCOURU;
+            push(pas->path, right);
+        }
+        // check above
+        else if (laby[above] == OUVERT && above != coordonnees(0, 1)) {
+            laby[above] = PARCOURU;
+            push(pas->path, above);
+        }
+        // check bottom
+        else if (laby[bottom] == OUVERT) {
+            laby[bottom] = PARCOURU;
+            push(pas->path, bottom);
+        }
+        else {
+            // node is dead end
+            printf("Aucun chemin pour le node");
+            laby[top(pas->path)] = OUVERT;
+            pop(pas->path);
+        }
+
+        printf("Avancement du parcours :\n");
+        printf_laby(laby);
+    }
+
+    return pas;
+
+    // DFS
+}
+
+int printf_solution(int *laby, Stack path) {
+    while(size(path) > 0) {
+        laby[top(path)] = PARCOURU;
+        pop(path);
+    }
+    printf_laby(laby);
     return 0;
 }
 
@@ -97,6 +150,14 @@ int main() {
 
     Pas pas;
     init_pas(&pas);
+    parcourir(laby, &pas);
+
+    if(size(pas.path) > 0) {
+        printf("Bravo, un chemin a été trouvé!\n");
+        printf_solution(laby, pas.path);
+    } else {
+        printf("Le labyrinthe n'a pas de solution");
+    }
 
     return 0;
 }
