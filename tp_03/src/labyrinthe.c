@@ -61,14 +61,15 @@ int printf_laby(int *laby) {
 
 int propose(int *laby) {
     char answer;
-    // while(answer != 'y') {
+    while(answer != 'y') {
         new_laby(laby);
         printf_laby(laby);
 
-        printf("Utiliser le labyrinthe ? [y/N] y\n");
-        // scanf("%c\n", &answer);
-        // printf("Votre réponse : %c\n", answer);
-    // }
+        printf("Utiliser le labyrinthe ? [y/N]\n");
+        scanf("%c", &answer);
+        printf("Votre réponse : %c\n", answer);
+        fflush(stdin);
+    }
     return 0;
 }
 
@@ -88,16 +89,28 @@ int init_pas(Pas *pas) {
     return 0;
 }
 
+int printf_solution(int *laby, Stack path) {
+    while(size(path) > 0) {
+        laby[top(path)] = PARCOURU;
+        pop(path);
+    }
+    printf_laby(laby);
+    return 0;
+}
+
 Pas *parcourir(int *laby, Pas *pas) {
     // MST
-    while (size(pas->path) > 2 || top(pas->path) != pas->end) {
+    printf("\nDébut du labyrinthe :\n");
+    printf_solution(laby, pas->path);
+    while (size(pas->path) > 2 || top(pas->path) != pas->end)
+    {
         int left = top(pas->path) - 1;
         int right = top(pas->path) + 1;
         int above = top(pas->path) - COLONNES + 1;
         int bottom = top(pas->path) + COLONNES;
 
-            // check left
-        if (laby[left] == OUVERT)
+        // check left
+        if (laby[left] == OUVERT && left != coordonnees(1, 1))
         {
             laby[left] = PARCOURU;
             push(pas->path, left);
@@ -119,7 +132,7 @@ Pas *parcourir(int *laby, Pas *pas) {
         }
         else {
             // node is dead end
-            printf("Aucun chemin pour le node");
+            printf("Aucun chemin pour le node\n");
             laby[top(pas->path)] = OUVERT;
             pop(pas->path);
         }
@@ -131,15 +144,6 @@ Pas *parcourir(int *laby, Pas *pas) {
     return pas;
 
     // DFS
-}
-
-int printf_solution(int *laby, Stack path) {
-    while(size(path) > 0) {
-        laby[top(path)] = PARCOURU;
-        pop(path);
-    }
-    printf_laby(laby);
-    return 0;
 }
 
 int main() {

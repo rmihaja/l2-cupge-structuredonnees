@@ -15,5 +15,5 @@ $(MODULE)/%.o: $(SRC)/%.c
 $(DEST)/%: $(MODULE)/pile.o $(SRC)/%.c
 	gcc -Wall -I $(INCLUDE) $^ -o $(DEST)/$*
 
-test/sum: $(DEST)/sum
-	$< # insérer les données tests
+test/labyrinthe: $(MODULE)/pile.o $(SRC)/%.c
+	gcc -Wall -I $(INCLUDE) $^ -o $(DEST)/$*

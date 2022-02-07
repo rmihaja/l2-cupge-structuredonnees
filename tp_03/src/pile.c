@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 #include "pile.h"
 
@@ -19,14 +20,14 @@ Stack stack() {
     return stack;
 }
 
-// 0 := vide
-// 1 := non vide
+// 0 := non vide
+// 1 := vide
 int isEmpty(Stack stack) {
     if (stack->size == 0) {
-        return 0;
+        return 1;
     }
     else {
-        return 1;
+        return 0;
     }
 }
 
@@ -34,24 +35,25 @@ int size(Stack stack) {
     return stack->size;
 }
 
-// 0 := element dedans
-// 1 := element non dedans
+// 0 := element non dedans
+// 1 := element dedans
 int isIn(Stack stack, int n) {
+    assert(isEmpty(stack) == 0);
     Node current_node = stack->top;
     while (current_node != NULL) {
         if (current_node->value == n) {
-            return 0;
+            return 1;
         }
         current_node = current_node->next;
     }
-    return 1;
+    return 0;
 }
 
 Stack push(Stack stack, int n)
 {
     Node new_top = (Node)malloc(sizeof(struct node_s));
     new_top->value = n;
-    if (isEmpty(stack)) {
+    if (isEmpty(stack) == 1) {
         stack->top = new_top;
         stack->size++;
     }
@@ -66,10 +68,11 @@ Stack push(Stack stack, int n)
     return stack;
 }
 Stack pop(Stack stack) {
-    assert(isEmpty(stack));
+    assert(isEmpty(stack) == 0);
 
     Node old_top = stack->top;
     stack->top = stack->top->next;
+    old_top->next = NULL;
     free(old_top);
 
     stack->size--;
@@ -78,9 +81,25 @@ Stack pop(Stack stack) {
 }
 
 int top(Stack stack) {
-    assert(isEmpty(stack));
+    printf("%s", toString(stack));
+    assert(isEmpty(stack) == 0);
 
     return stack->top->value;
+}
+
+char *toString(Stack stack) {
+    if (isEmpty(stack)) {
+        return "[]";
+    }
+    char *result = "[";
+    Node current_top = stack->top;
+    while (current_top->next != NULL) {
+        sprintf(result, "%d", current_top->value);
+        strcat(result, ", ");
+        current_top = current_top->next;
+    }
+    sprintf(result, "%d", current_top->value);
+    return strcat(result, "]");
 }
 
 #ifdef DEBUG
@@ -89,6 +108,9 @@ int
 main() {
     Stack p;
     stack(&p);
+    push(p, 5);
+    push(p, 7);
+    top(p);
 }
 
 #endif

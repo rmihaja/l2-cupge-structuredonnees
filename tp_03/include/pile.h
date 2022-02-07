@@ -11,4 +11,6 @@ int size(Stack);
 int isEmpty(Stack);
 int top(Stack);
 
+char *toString(Stack);
+
 #endif
