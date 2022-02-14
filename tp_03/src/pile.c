@@ -58,21 +58,19 @@ Stack push(Stack stack, int n)
         stack->size++;
     }
     else {
-        if (isIn(stack, n) == 1) {
+        if (isIn(stack, n) == 0) {
             new_top->next = stack->top;
             stack->top = new_top;
             stack->size++;
         }
     }
-
     return stack;
 }
 Stack pop(Stack stack) {
     assert(isEmpty(stack) == 0);
 
     Node old_top = stack->top;
-    stack->top = stack->top->next;
-    old_top->next = NULL;
+    stack->top = old_top->next;
     free(old_top);
 
     stack->size--;
